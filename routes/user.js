@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 //Handlers from controllers
-const {signup,sendotp,login, logout, refreshAccessToken, forgotPassword, resetPassword} = require("../controllers/auth")
+const {signup,sendotp,login, logout, refreshAccessToken, forgotPassword, resetPassword, verifyotp} = require("../controllers/auth")
 const {fetchAuthUserProfile} = require("../controllers/user")
 const {requireAuthentication} = require("../middlewares/authCheck")
 router.post('/signup',signup)
@@ -15,6 +15,7 @@ router.post("/reauth", refreshAccessToken)
 //     "/forgotpass",
 //     forgotPassword
 // )
+router.post('/verifyotp',verifyotp)
 router.post('/forgotpass',forgotPassword,sendotp)
 router.patch(
     "/resetpass",
