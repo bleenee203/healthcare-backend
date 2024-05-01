@@ -51,37 +51,28 @@ exports.signup = async(req,res)=>{
                 message:'The OTP is not valid'
             })
         }
-        //secure password
-        // let hashedPassword
-        // try{
-        //     hashedPassword = await bcrypt.hash(password,10)
-        // }catch(err){
-        //     return res.status(500).json({
-        //         success: false,
-        //         message : `Hashing pasword error for ${password}: `+err.message
-        //     })
-        // }
+        
         const User = await user.create({
             email, password,
         })
 
-        //create access token
-        const aTkn = await User.generateAcessToken();
-        //create refresh token
-        const refreshToken = await User.generateRefreshToken();
-        //set a refresh token cookie in response
-        res.cookie(
-            REFRESH_TOKEN.cookie.name,
-            refreshToken,
-            REFRESH_TOKEN.cookie.options
-          );
+        // //create access token
+        // const aTkn = await User.generateAcessToken();
+        // //create refresh token
+        // const refreshToken = await User.generateRefreshToken();
+        // //set a refresh token cookie in response
+        // res.cookie(
+        //     REFRESH_TOKEN.cookie.name,
+        //     refreshToken,
+        //     REFRESH_TOKEN.cookie.options
+        //   );
         
         return res.status(200).json({
             success: true,
             User,
             message: "User created successfully",
-            accessToken: aTkn,
-            refreshToken: refreshToken
+            // accessToken: aTkn,
+            // refreshToken: refreshToken
         })
     }catch(err){
         console.log(err)

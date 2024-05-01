@@ -11,10 +11,6 @@ router.post('/login',login)
 router.get('/me', requireAuthentication, fetchAuthUserProfile)
 router.post('/logout',requireAuthentication,logout)
 router.post("/reauth", refreshAccessToken)
-// router.post(
-//     "/forgotpass",
-//     forgotPassword
-// )
 router.post('/verifyotp',verifyotp)
 router.post('/forgotpass',forgotPassword,sendotp)
 router.patch(
