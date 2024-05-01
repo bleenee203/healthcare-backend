@@ -289,11 +289,27 @@ module.exports.forgotPassword = async (req, res, next) => {
     } catch (err) {
       next(err);
     }
-  };
-  
+};
+
 module.exports.resetPassword = async (req, res, next) => {
     try {
-      const {email,password,otp} = req.body
+      const {email,password} = req.body
+      const lossuser  = await user.findOne({email})
+      lossuser.password=password
+      await lossuser.save()
+      res.json({
+        message: "Password reset successful",
+        success: true,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
+  module.exports.verifyotp = async (req, res, next) => {
+    try {
+      const {email,otp} = req.body
       //find the most recent otp for the email
       const response = await OTP.find({email}).sort({createdAt:-1}).limit(1)
       //it returns an array with length = 1 if it successes
@@ -304,22 +320,7 @@ module.exports.resetPassword = async (req, res, next) => {
               message:'The OTP is not valid'
           })
       }
-      //secure password
-    //   let hashedPassword
-    //   try{
-    //       hashedPassword = await bcrypt.hash(password,10)
-    //       console.log(hashedPassword)
-    //   }catch(err){
-    //       return res.status(500).json({
-    //           success: false,
-    //           message : `Hashing pasword error for ${password}: `+err.message
-    //       })
-    //   }
-      const lossuser  = await user.findOne({email})
-      lossuser.password=password
-      await lossuser.save()
       res.json({
-        message: "Password reset successful",
         success: true,
       });
     } catch (error) {
