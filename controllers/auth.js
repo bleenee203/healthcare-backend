@@ -121,13 +121,13 @@ exports.sendotp = async(req,res)=>{
         const {email} = req.body;
         //check if user is already present
         //find user with provided email
-        // const checkUserPresent = await user.findOne({email})
-        // if(checkUserPresent){
-        //     return res.status(401).json({
-        //         success:false,
-        //         message:"User is already register"
-        //     })
-        // }
+        const checkUserPresent = await user.findOne({email})
+        if(checkUserPresent){
+            return res.status(401).json({
+                success:false,
+                message:"User is already register"
+            })
+        }
         var otp = otpGenerator.generate(6,{
             upperCaseAlphabets: false,
             lowerCaseAlphabets: false,
@@ -151,7 +151,7 @@ exports.sendotp = async(req,res)=>{
         const otpBody = await OTP.create(otpPayload)
         console.log(`OTP Body ${otpBody}`)
         res.status(200).json({
-            succes:true,
+            success:true,
             message: "OTP sent successfully",
             otp
         })
@@ -168,7 +168,7 @@ exports.sendotp = async(req,res)=>{
 module.exports.logout = async (req, res, next) => {
     try {
       // Authenticated user ID attached on `req` by authentication middleware
-      const userId = req.body._id.$oid;
+      const userId = req.userId
       const userlogin = await user.findById(userId);
   
       const cookies = req.cookies;
