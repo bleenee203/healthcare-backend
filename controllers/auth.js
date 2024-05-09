@@ -164,7 +164,45 @@ exports.sendotp = async(req,res)=>{
         })
     }
 }
+exports.sendotpforchangepass = async(req,res)=>{
+  try{
+      const {email} = req.body;
+      var otp = otpGenerator.generate(6,{
+          upperCaseAlphabets: false,
+          lowerCaseAlphabets: false,
+          specialChars: false,
+      })
+      const result = await OTP.findOne({otp:otp})
+      console.log("Result is generate OTP")
+      console.log(`OTP ${otp}`)
+      console.log(`Result ${result}`)
+      //if otp already exists, create another otp
+      while (result){
+          otp = otpGenerator.generate(6,{
+              upperCaseAlphabets: false,
+              lowerCaseAlphabets: false,
+              specialChars: false,
+          })
+          result = await OTP.findOne({otp:otp})
+      }
+      //create otp schema
+      const otpPayload = {email,otp}
+      const otpBody = await OTP.create(otpPayload)
+      console.log(`OTP Body ${otpBody}`)
+      res.status(200).json({
+          success:true,
+          message: "OTP sent successfully",
+          otp
+      })
 
+  }catch(err){
+      console.log(err)
+      return res.status(500).json({
+          success: false,
+          error: err.message
+      })
+  }
+}
 module.exports.logout = async (req, res, next) => {
     try {
       // Authenticated user ID attached on `req` by authentication middleware
@@ -271,11 +309,16 @@ module.exports.forgotPassword = async (req, res, next) => {
     try {
       const email = req.body.email;
       const userloss = await user.findOne({ email });
+      console.log(userloss)
       // If email is not found, we throw an exception BUT with 200 status code
       // because it is a security vulnerability to inform users
       // that the Email is not found.
       // To avoid username enumeration attacks, no extra response data is provided when an email is successfully sent. (The same response is provided when the username is invalid.)
-      if (!userloss) throw new CustomError("Reset otp sent", 200, MSG);
+      if (!userloss) {
+        const error = new Error("User not found!");
+        error.statusCode = 404; // Set the status code to 404
+        throw error; // Throw the error
+      }
       next()
     } catch (err) {
       next(err);
@@ -289,7 +332,7 @@ module.exports.resetPassword = async (req, res, next) => {
       lossuser.password=password
       await lossuser.save()
       res.json({
-        message: "Password reset successful",
+        message: "Password reset successfully",
         success: true,
       });
     } catch (error) {
