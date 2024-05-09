@@ -297,7 +297,21 @@ module.exports.resetPassword = async (req, res, next) => {
       next(error);
     }
   };
-
+  module.exports.changePass = async (req,res,next)=>{
+    try{
+      const {email,oldPassword,newPassword} = req.body
+      const loginuser = await user.findByCredentials(email, oldPassword); // Identify and retrieve user by credentials
+      loginuser.password=newPassword
+      await loginuser.save();
+      res.json({
+        message: "Password changed successfully",
+        success: true,
+      });
+    }catch(error){
+      console.log(error);
+      next(error);
+    }
+  }
   module.exports.verifyotp = async (req, res, next) => {
     try {
       const {email,otp} = req.body

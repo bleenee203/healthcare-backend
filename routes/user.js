@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 //Handlers from controllers
-const {signup,sendotp,login, logout, refreshAccessToken, forgotPassword, resetPassword, verifyotp} = require("../controllers/auth")
+const {signup,sendotp,login, logout, refreshAccessToken, forgotPassword, resetPassword, verifyotp, changePass} = require("../controllers/auth")
 const {fetchAuthUserProfile} = require("../controllers/user")
 const {requireAuthentication} = require("../middlewares/authCheck")
 router.post('/signup',signup)
@@ -17,4 +17,7 @@ router.patch(
     "/resetpass",
     resetPassword
   )
+router.patch(
+  "/changepass",requireAuthentication,changePass
+)
 module.exports = router
