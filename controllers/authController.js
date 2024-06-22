@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
-const user = require('../models/user')
+const user = require('../models/userModel')
 const otpGenerator = require("otp-generator")
-const OTP = require('../models/otp')
+const OTP = require('../models/otpModel')
 const crypto = require("crypto");
 const AuthorizationError = require("../utils/errors/AuthorizationError");
 const jwt = require("jsonwebtoken");
@@ -87,10 +87,10 @@ exports.login = async (req, res, next) => {
         const { email, password } = req.body;
 
         /* Custom methods on user are defined in User model */
-        const loginuser = await user.findByCredentials(email, password); // Identify and retrieve user by credentials
-        const accessToken = await loginuser.generateAcessToken(); // Create Access Token
-        const refreshToken = await loginuser.generateRefreshToken(); // Create Refresh Token
-
+        const _user = await user.findByCredentials(email, password); // Identify and retrieve user by credentials
+        const accessToken = await _user.generateAcessToken(); // Create Access Token
+        const refreshToken = await _user.generateRefreshToken(); // Create Refresh Token
+        console.log(_user);
         // SET refresh Token cookie in response
         res.cookie(
             REFRESH_TOKEN.cookie.name,
@@ -106,7 +106,10 @@ exports.login = async (req, res, next) => {
         // Send Response on successful Login
         res.json({
             success: true,
-            loginuser,
+            loginuser:{
+              _id:_user._id.toString(),
+              email:_user.email,
+            },
             accessToken,
             refreshToken
         });
@@ -115,6 +118,7 @@ exports.login = async (req, res, next) => {
         next(error);
     }
 };
+
 //send OTP for email verification
 exports.sendotp = async(req,res)=>{
     try{
@@ -343,6 +347,7 @@ module.exports.resetPassword = async (req, res, next) => {
   module.exports.changePass = async (req,res,next)=>{
     try{
       const {email,oldPassword,newPassword} = req.body
+      console.log(req.body)
       const loginuser = await user.findByCredentials(email, oldPassword); // Identify and retrieve user by credentials
       loginuser.password=newPassword
       await loginuser.save();
