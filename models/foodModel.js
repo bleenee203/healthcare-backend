@@ -6,7 +6,8 @@ const foodSchema = new mongoose.Schema({
         requie:true
     },
     kcal:{
-        type:Number
+        type:Number,
+        require:true
     },
     carbs:{
         type:Number,
@@ -19,12 +20,25 @@ const foodSchema = new mongoose.Schema({
     },
     isDeleted:{
         type:Boolean
+    },
+    ration:{
+        type:Number,
+        require:true
+    },
+    avg_above:{
+        type:Number,
+        require:true
+    },
+    user_id:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'users'
     }
 })
+
 foodSchema.set("toJSON",{
     transform: function(doc,ret,options){
-        const {food_name,kcal,carbs,protein,fat,isDeleted} = ret
-        return ret
+        const {food_name,kcal,carbs,protein,fat,isDeleted,ration,avg_above,user_id} = ret
+        return {food_name,kcal,carbs,protein,fat,isDeleted,ration,avg_above,user_id}
     }
 })
 const Food = mongoose.model('foods',foodSchema)
