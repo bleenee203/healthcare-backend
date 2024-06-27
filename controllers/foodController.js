@@ -2,6 +2,7 @@ const food = require("../models/foodModel");
 module.exports.createFood = async (req,res,next) =>{
     try{
         const {food_name,kcal,carbs,protein,fat,ration,avg_above} = req.body.newData
+        console.log(req.body.newData)
         const user_id = req.body.userId
         const isDeleted=false;
         if(!food_name){
@@ -9,7 +10,7 @@ module.exports.createFood = async (req,res,next) =>{
             success:false,
             message:"Please provide name of food"});
         }
-        if(!kcal){
+        if(kcal==null){
             return res.status(403).send({
             success:false,
             message:"Please provide kcal of food"});
@@ -36,10 +37,14 @@ module.exports.createFood = async (req,res,next) =>{
 exports.updateFood = async (req, res, next) => {
     try {
       const  id  = req.params.id;
-      const { food_name,kcal,carbs,protein,fat,ration,avg_above} = req.body;
+      const { food_name,kcal,carbs,protein,fat,ration,avg_above} = req.body.newData;
+      const existingFood = await food.findOne({ food_name, _id: { $ne: id } }); 
+    if (existingFood) {
+      return res.status(400).json({ message: 'Food name already in use',success:false });
+    }
       const updatedFood = await food.findByIdAndUpdate(id, { food_name,kcal,carbs,protein,fat,ration,avg_above}, { new: true });
       if (!updatedFood) {
-        return res.status(404).json({ message: 'Food not found' });
+        return res.status(404).json({ message: 'Food not found',success:false  });
       }
       return res.status(200).json({
         success: true,
@@ -53,7 +58,7 @@ exports.updateFood = async (req, res, next) => {
   exports.deleteFood = async (req, res, next) => {
     try {
       const  id  = req.params.id;
-      const updatedFood = await food.findByIdAndUpdate(id, { isDeleted:false});
+      const updatedFood = await food.findByIdAndUpdate(id, { isDeleted:true});
       if (!updatedFood) {
         return res.status(404).json({ message: 'Food not found' });
       }
@@ -96,12 +101,26 @@ exports.updateFood = async (req, res, next) => {
   };
   exports.getFoodByName = async (req, res, next) => {
     try {
-      const { food_name } = req.body;
-      const Food = await food.findOne({food_name:food_name,isDeleted:false});
-      if (!Food) {
+      const { name } = req.query;
+      const regex  = new RegExp(name,'i');
+      const foods = await food.find({food_name:regex,isDeleted:false,user_id:null});
+      if (!foods) {
         return res.status(404).json({ message: 'Food not found' });
       }
-      res.json(Food);
+      res.json(foods);
+    } catch (err) {
+      next(err);
+    }
+  };
+  exports.getUserFoodByName = async (req, res, next) => {
+    try {
+      const { name,id } = req.query;
+      const regex  = new RegExp(name,'i');
+      const foods = await food.find({food_name:regex,isDeleted:false,user_id:id});
+      if (!foods) {
+        return res.status(404).json({ message: 'Food not found' });
+      }
+      res.json(foods);
     } catch (err) {
       next(err);
     }
