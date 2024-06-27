@@ -37,8 +37,9 @@ const foodSchema = new mongoose.Schema({
 
 foodSchema.set("toJSON",{
     transform: function(doc,ret,options){
-        const {food_name,kcal,carbs,protein,fat,isDeleted,ration,avg_above,user_id} = ret
-        return {food_name,kcal,carbs,protein,fat,isDeleted,ration,avg_above,user_id}
+        ret.id = ret._id;
+        const {id,food_name,kcal,carbs,protein,fat,isDeleted,ration,avg_above,user_id} = ret
+        return {id,food_name,kcal,carbs,protein,fat,isDeleted,ration,avg_above,user_id}
     }
 })
 const Food = mongoose.model('foods',foodSchema)
