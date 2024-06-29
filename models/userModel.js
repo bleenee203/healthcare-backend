@@ -40,6 +40,61 @@ const userSchema = new mongoose.Schema({
         type:String,
         require:true,
     },
+    fullname:{
+      type:String,
+    },
+    gender:{
+      type:Boolean
+    },
+    birthday:{
+      type:Date
+    },
+    created_at:{
+      type:Date
+    },
+    updated_at:{
+      type:Date
+    },
+    is_deleted:{
+      type:Boolean
+    },
+    calo_target:{
+      type:Number,
+      default: 1500
+    },
+    weight_target:{
+      type:Number
+    },
+    water_target:{
+      type:Number
+    },
+    sleep_target:{
+      type:Number
+    },
+    step_target:{
+      type:Number
+    },
+    sleep_end_target:{
+      type:Date
+    },
+    sleep_begin_target:{
+      type:Date
+    },
+    exercise_day_target:{
+      type:Number
+    },
+    career:{
+      type:String
+    },
+    blood_type:{
+      type:String
+    },
+    height:{
+      type:Number
+    },
+    cccd:{
+      type:String
+    },
     //store refresh token in database
     tokens: [
         {
@@ -53,9 +108,9 @@ const userSchema = new mongoose.Schema({
 userSchema.set("toJSON", {
     virtuals: true,
     transform: function (doc, ret, options) {
-      const { email } = ret;
-  
-      return { email }; // return fields we need
+      const { email,phone,career,blood_type,fullname,gender,birthday,cccd,calo_target } = ret;
+      
+      return { email,phone,career,blood_type,fullname,gender,birthday,cccd,calo_target }; // return fields we need
     },
 });
 //ensures that password attribute of a user is hashed if it was modified
@@ -139,12 +194,13 @@ userSchema.methods.generateResetToken = async function () {
     return resetToken;
 };  
 userSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({email});
+    console.log(user)
     if (!user)
     throw new CustomError(
-        "Cant not find user!",
-        404,
-        "User is invalid!"
+        "Wrong                                                                                                                        !",
+        400,
+        "Email or password is wrong!"
       );
     const passwdMatch = await bcrypt.compare(password, user.password);
     console.log(user.password)

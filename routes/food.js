@@ -1,0 +1,13 @@
+const express = require('express')
+const { createFood, updateFood, deleteFood, getAllFood, getFoodByName, getAllUserFood, getUserFoodByName, getFoodById } = require('../controllers/foodController')
+const { requireAuthentication } = require('../middlewares/authCheck')
+const router = express.Router()
+router.post('/create-food',createFood)
+router.patch('/update-food/:id',requireAuthentication,updateFood)
+router.patch('/delete-food/:id',requireAuthentication,deleteFood)
+router.get('/get-all-user-food/:id',requireAuthentication,getAllUserFood)
+router.get('/get-all-food',getAllFood)
+router.get('/search-food',getFoodByName)
+router.get('/search-user-food',requireAuthentication,getUserFoodByName)
+// router.get('/get-food/:id',getFoodById)
+module.exports = router
