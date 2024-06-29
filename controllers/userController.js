@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const moment = require('moment');
 
 module.exports.fetchAuthUserProfile = async (req, res, next) => {
     try {
@@ -18,6 +19,8 @@ module.exports.fetchAuthUserProfile = async (req, res, next) => {
 module.exports.updateUserData = async (req,res,next) => {
   try{
     const {userId,newData} = req.body;
+    console.log(newData['birthday']);
+    newData['birthday'] = moment(newData['birthday'], 'DD/MM/YYYY').add(12, 'hours').toDate();
     const updatedUser = await User.findByIdAndUpdate(userId,newData,{new:true});
     if(!updatedUser){
       return res.status(404),json({
