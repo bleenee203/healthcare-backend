@@ -25,9 +25,11 @@ require('./config/db').connect()
 //route import
 const user = require('./routes/user');
 const food = require('./routes/food')
+const meal = require('./routes/meal')
 const bodyParser = require('body-parser');
 app.use("/api/user",user)
 app.use("/api/food",food)
+app.use("/api/meal",meal)
 
 // Handle unregistered route for all HTTP Methods
 app.all("*", function (req, res, next) {

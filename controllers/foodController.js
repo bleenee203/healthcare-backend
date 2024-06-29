@@ -125,3 +125,15 @@ exports.updateFood = async (req, res, next) => {
       next(err);
     }
   };
+  // exports.getFoodById = async (req, res, next) => {
+  //   try {
+  //     const id  = req.params.id;
+  //     const Food = await food.findById(id);
+  //     if (!Food) {
+  //       return res.status(404).json({ message: 'Food not found' });
+  //     }
+  //     return res.status(200).json(Food);
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // };
