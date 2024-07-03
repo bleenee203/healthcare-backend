@@ -66,7 +66,8 @@ const userSchema = new mongoose.Schema({
       type:Number
     },
     water_target:{
-      type:Number
+      type:Number,
+      default: 1500
     },
     sleep_target:{
       type:Number
@@ -108,9 +109,9 @@ const userSchema = new mongoose.Schema({
 userSchema.set("toJSON", {
     virtuals: true,
     transform: function (doc, ret, options) {
-      const { email,phone,career,blood_type,fullname,gender,birthday,cccd,calo_target } = ret;
+      const { email,phone,career,blood_type,fullname,gender,birthday,cccd,calo_target,water_target } = ret;
       
-      return { email,phone,career,blood_type,fullname,gender,birthday,cccd,calo_target }; // return fields we need
+      return { email,phone,career,blood_type,fullname,gender,birthday,cccd,calo_target,water_target }; // return fields we need
     },
 });
 //ensures that password attribute of a user is hashed if it was modified

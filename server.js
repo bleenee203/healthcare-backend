@@ -1,4 +1,5 @@
 const express  = require('express')
+const moment  = require('moment')
 const app  = express()
 require('dotenv').config()
 const cookieParser = require("cookie-parser");
@@ -27,9 +28,11 @@ const user = require('./routes/user');
 const food = require('./routes/food')
 const meal = require('./routes/meal')
 const bodyParser = require('body-parser');
+const drink = require('./routes/drink')
 app.use("/api/user",user)
 app.use("/api/food",food)
 app.use("/api/meal",meal)
+app.use("/api/drink",drink)
 
 // Handle unregistered route for all HTTP Methods
 app.all("*", function (req, res, next) {
@@ -42,5 +45,3 @@ app.use(AppErrorHandler); // General app error handler
 app.listen(PORT,()=>{
     console.log(`Server is running on ${PORT}`)
 })
-
-  
