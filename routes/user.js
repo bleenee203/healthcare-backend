@@ -20,5 +20,5 @@ router.patch(
 router.patch(
   "/changepass",requireAuthentication,changePass
 )
-router.put('/update-user',requireAuthentication,updateUserData)
+router.patch('/update-user',requireAuthentication,updateUserData)
 module.exports = router
