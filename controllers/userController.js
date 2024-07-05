@@ -23,6 +23,37 @@ module.exports.updateUserData = async (req,res,next) => {
     if(newData['birthday']){
       newData['birthday'] = moment(newData['birthday'], 'DD/MM/YYYY').add(12, 'hours').toDate();
     }
+
+    if (newData['sleep_begin_target']) {
+      const timeString = newData['sleep_begin_target'];
+      
+      const [hours, minutes] = timeString.split(":").map(part => parseInt(part, 10));
+      if (!isNaN(hours) && !isNaN(minutes)) {
+        const sleepBeginTarget = new Date();
+        sleepBeginTarget.setHours(hours, minutes, 0); // Đặt giờ, phút và giây
+      
+        newData['sleep_begin_target'] = sleepBeginTarget;
+      } else {
+        console.error('Invalid time format:', timeString);
+        // Xử lý lỗi hoặc thông báo lỗi cho người dùng
+      }
+    }
+
+    if (newData['sleep_end_target']) {
+      const timeString = newData['sleep_end_target'];
+      const [hours, minutes] = timeString.split(":").map(part => parseInt(part, 10));
+
+      if (!isNaN(hours) && !isNaN(minutes)) {
+        const sleepEndTarget = new Date();
+        sleepEndTarget.setHours(hours, minutes, 0); // Đặt giờ, phút và giây
+      
+        newData['sleep_end_target'] = sleepEndTarget;
+      } else {
+        console.error('Invalid time format:', timeString);
+        // Xử lý lỗi hoặc thông báo lỗi cho người dùng
+      }
+    }
+
     const updatedUser = await User.findByIdAndUpdate(userId,newData,{new:true});
     if(!updatedUser){
       return res.status(404),json({
@@ -43,4 +74,5 @@ module.exports.updateUserData = async (req,res,next) => {
       error: error.message,
     });
   }
+  
 }
