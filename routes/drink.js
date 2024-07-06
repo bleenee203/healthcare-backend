@@ -1,7 +1,10 @@
 const express = require('express')
-const { createDrink, deleteDrink, getWaterLog, getDrink } = require('../controllers/drinkController')
+const { createDrink, deleteDrink, getWaterLog, getDrink, getWaterLogByMonth, getWaterLogByQuarter, getWaterWeekLogByMonth, getWaterMonthLogByYear } = require('../controllers/drinkController')
 const router = express.Router()
 router.post('/create-drink',createDrink)
 router.get('/get-water-week',getWaterLog)
+router.get('/get-water-month',getWaterLogByMonth)
+router.get('/get-water-week-month',getWaterWeekLogByMonth)
+router.get('/get-water-year',getWaterMonthLogByYear)
 router.patch('/remove-water-log/:id',deleteDrink)
 module.exports = router
