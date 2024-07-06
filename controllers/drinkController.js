@@ -33,6 +33,35 @@ module.exports.createDrink = async (req, res, next) => {
         next(error);
     }
 };
+module.exports.createDrinkByDate = async (req, res, next) => {
+    try {
+        const { amount,date } = req.body.newData;
+        if (!amount) {
+            return res.status(403).send({
+                success: false,
+                message: "Please provide amount of water"
+            });
+        }
+        const user_id = req.body.userId;
+        const isDeleted = false;
+        const formatdate = moment.tz(date,systemTimeZone).toISOString()
+        const newDrink = await Drink.create({
+            user_id,
+            date: formatdate,
+            updated_at:formatdate,
+            amount,
+            isDeleted
+        });
+        return res.status(200).json({
+            success: true,
+            Drink: newDrink,
+            message: "Successfully recorded water intake log"
+        });
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
 
   exports.deleteDrink = async (req, res, next) => {
     try {
@@ -264,11 +293,31 @@ exports.getWaterWeekLogByMonth = async (req, res, next) => {
                 totalAmount: drinkOfWeek ? drinkOfWeek.totalAmount : 0
             };
         });
-
+        const drinksMap = drinks.reduce((acc, drink) => {
+            acc[drink.date] = drink.totalAmount;
+            return acc;
+        }, {});
+        // Create an array of all dates in the month
+        const monthDates = [];
+        const daysInMonth = moment(startOfMonth).daysInMonth();
+        for (let i = 0; i < daysInMonth; i++) {
+            const date = moment(startOfMonth).add(i, 'days').format('YYYY-MM-DD');
+            monthDates.push(date);
+        }
+        const yearDays = [];
+        monthDates.map(date => {
+            const totalAmount = drinksMap[date] || 0;
+            yearDays.push({
+                date: moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+                totalAmount: totalAmount
+            });
+            return totalAmount;
+        });
         return res.status(200).json({
             success: true,
             month: month,
-            drinks: convertedDrinks
+            drinks: convertedDrinks,
+            days:yearDays
         });
     } catch (error) {
         console.error(error);
@@ -278,82 +327,6 @@ exports.getWaterWeekLogByMonth = async (req, res, next) => {
         });
     }
 };
-// exports.getWaterMonthLogByYear = async (req, res, next) => {
-//     try {
-//         const { user_id, date } = req.query;
-
-//         // Check if date and user_id are provided
-//         if (!user_id || !date) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: "Please provide user_id and date (format: 'YYYY-MM-DD')"
-//             });
-//         }
-
-//         // Get the year from the provided date
-//         const year = moment(date, 'YYYY-MM-DD').year();
-
-//         // Initialize an array to hold the drink data for each month
-//         const yearDrinks = [];
-
-//         // Iterate through each month of the year
-//         for (let month = 0; month < 12; month++) {
-//             const startOfMonth = moment().year(year).month(month).startOf('month').toDate();
-//             const endOfMonth = moment().year(year).month(month).endOf('month').toDate();
-
-//             // Query the drink data for the month
-//             const drinks = await Drink.aggregate([
-//                 {
-//                     $match: {
-//                         user_id: mongoose.Types.ObjectId.createFromHexString(user_id),
-//                         date: {
-//                             $gte: startOfMonth,
-//                             $lte: endOfMonth
-//                         }
-//                     }
-//                 },
-//                 {
-//                     $group: {
-//                         _id: null, // We don't need to group by any specific field
-//                         totalAmount: { $sum: "$amount" }
-//                     }
-//                 },
-//                 {
-//                     $project: {
-//                         _id: 0,
-//                         totalAmount: 1
-//                     }
-//                 }
-//             ]);
-
-//             // If there are no drinks recorded for the month, set totalAmount to 0
-//             const totalAmount = drinks.length > 0 ? drinks[0].totalAmount : 0;
-
-//             // Add the month's totalAmount to the yearDrinks array
-//             yearDrinks.push({
-//                 month: month + 1, // Month is zero-based, so we add 1
-//                 totalAmount: totalAmount
-//             });
-//         }
-
-//         // Calculate the average water intake per month
-//         const totalYearAmount = yearDrinks.reduce((sum, monthData) => sum + monthData.totalAmount, 0);
-//         const averageMonthlyIntake = (totalYearAmount / 12).toFixed(2);
-
-//         return res.status(200).json({
-//             success: true,
-//             year: year,
-//             drinks: yearDrinks,
-//             avg: parseFloat(averageMonthlyIntake)
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Failed to fetch monthly drink summary"
-//         });
-//     }
-// };
 exports.getWaterMonthLogByYear = async (req, res, next) => {
     try {
         const { user_id, date } = req.query;

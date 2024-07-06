@@ -4,6 +4,6 @@ const { requireAuthentication } = require('../middlewares/authCheck')
 const { getDrink } = require('../controllers/drinkController')
 const router = express.Router()
 router.post('/create-meal',requireAuthentication,createMeal)
-router.get('/get-meal',requireAuthentication,getAllFoodMealByDate)
+router.get('/get-meal',getAllFoodMealByDate)
 router.patch('/remove-food/:id',requireAuthentication,deleteFoodofMeal)
 module.exports = router
