@@ -7,14 +7,14 @@ const exerciseSchema = new mongoose.Schema({
         requie:true
     },
     duration:{
-        type:Number,
-        require:true
+        type:Number
     },
     distance:{
         type:Number,
     },
     calo_burn:{
-        type:Number
+        type:Number,
+        require: true
     },
     date:{
         type:Date,
@@ -39,5 +39,5 @@ exerciseSchema.set("toJSON",{
         return {id,type,duration,distance,calo_burn,date,start_time,updated_at,user_id}
     }
 })
-const Exercise = mongoose.model('exercises', exerciseSchema)
+const Exercise = mongoose.model('activities', exerciseSchema)
 module.exports = Exercise
