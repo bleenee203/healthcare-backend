@@ -110,7 +110,7 @@ exports.getSleepLog = async (req, res, next) => {
 
         const convertedSleeps = weekDates.map(date => ({
             date: moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY'), // Chuyển đổi định dạng ngày trước khi trả về
-            totalDuration: sleepsMap[date] || 0
+            totalDuration: sleepsMap[date] || 10
         }));
 
         
@@ -192,7 +192,7 @@ exports.getSleepLogByMonth = async (req, res, next) => {
         // Chuyển đổi dữ liệu để phù hợp với định dạng ngày trước khi trả về
         const convertedSleeps = monthDates.map(date => ({
             date: moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-            totalDuration: sleepsMap[date] || 0
+            totalDuration: sleepsMap[date] || 100
         }));
 
         // Tính toán tổng và trung bình lượng nước uống trong tháng
@@ -229,7 +229,7 @@ exports.getSleepWeekLogByMonth = async (req, res, next) => {
         const endOfMonth = moment(month, 'YYYY-MM').endOf('month').toDate();
 
         // Truy vấn danh sách ngày và tổng lượng nước uống trong cùng một tháng sử dụng aggregation
-        const drinks = await Drink.aggregate([
+        const sleeps = await Sleep.aggregate([
             {
                 $match: {
                     user_id: mongoose.Types.ObjectId.createFromHexString(user_id),
@@ -242,14 +242,14 @@ exports.getSleepWeekLogByMonth = async (req, res, next) => {
             {
                 $group: {
                     _id: { week: { $isoWeek: "$date" } }, // Nhóm theo tuần trong năm
-                    totalAmount: { $sum: "$amount" } // Tổng lượng nước uống trong tuần
+                    totalDuration: { $sum: "$duration" } // Tổng lượng nước uống trong tuần
                 }
             },
             {
                 $project: {
                     _id: 0, // Loại bỏ trường _id được tạo ra từ $group
                     week: "$_id.week", // Trường week là số tuần trong năm
-                    totalAmount: 1 // Tổng lượng nước uống trong tuần
+                    totalDuration: 1 // Tổng lượng nước uống trong tuần
                 }
             }
         ]);
@@ -264,103 +264,27 @@ exports.getSleepWeekLogByMonth = async (req, res, next) => {
         }
 
         // Chuyển đổi dữ liệu để phù hợp với định dạng mong muốn trước khi trả về
-        const convertedDrinks = weeksInMonth.map(week => {
-            const drinkOfWeek = drinks.find(drink => drink.week === week);
+        const convertedSleeps = weeksInMonth.map(week => {
+            const sleepOfWeek = sleeps.find(sleep => sleep.week === week);
             return {
                 week: week,
-                totalAmount: drinkOfWeek ? drinkOfWeek.totalAmount : 0
+                totalDuration: sleepOfWeek ? sleepOfWeek.totalDuration : 0
             };
         });
 
         return res.status(200).json({
             success: true,
             month: month,
-            drinks: convertedDrinks
+            sleeps: convertedSleeps
         });
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             success: false,
-            message: "Failed to fetch weekly drink summary"
+            message: "Failed to fetch weekly sleep summary"
         });
     }
 };
-// exports.getWaterMonthLogByYear = async (req, res, next) => {
-//     try {
-//         const { user_id, date } = req.query;
-
-//         // Check if date and user_id are provided
-//         if (!user_id || !date) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: "Please provide user_id and date (format: 'YYYY-MM-DD')"
-//             });
-//         }
-
-//         // Get the year from the provided date
-//         const year = moment(date, 'YYYY-MM-DD').year();
-
-//         // Initialize an array to hold the drink data for each month
-//         const yearDrinks = [];
-
-//         // Iterate through each month of the year
-//         for (let month = 0; month < 12; month++) {
-//             const startOfMonth = moment().year(year).month(month).startOf('month').toDate();
-//             const endOfMonth = moment().year(year).month(month).endOf('month').toDate();
-
-//             // Query the drink data for the month
-//             const drinks = await Drink.aggregate([
-//                 {
-//                     $match: {
-//                         user_id: mongoose.Types.ObjectId.createFromHexString(user_id),
-//                         date: {
-//                             $gte: startOfMonth,
-//                             $lte: endOfMonth
-//                         }
-//                     }
-//                 },
-//                 {
-//                     $group: {
-//                         _id: null, // We don't need to group by any specific field
-//                         totalAmount: { $sum: "$amount" }
-//                     }
-//                 },
-//                 {
-//                     $project: {
-//                         _id: 0,
-//                         totalAmount: 1
-//                     }
-//                 }
-//             ]);
-
-//             // If there are no drinks recorded for the month, set totalAmount to 0
-//             const totalAmount = drinks.length > 0 ? drinks[0].totalAmount : 0;
-
-//             // Add the month's totalAmount to the yearDrinks array
-//             yearDrinks.push({
-//                 month: month + 1, // Month is zero-based, so we add 1
-//                 totalAmount: totalAmount
-//             });
-//         }
-
-//         // Calculate the average water intake per month
-//         const totalYearAmount = yearDrinks.reduce((sum, monthData) => sum + monthData.totalAmount, 0);
-//         const averageMonthlyIntake = (totalYearAmount / 12).toFixed(2);
-
-//         return res.status(200).json({
-//             success: true,
-//             year: year,
-//             drinks: yearDrinks,
-//             avg: parseFloat(averageMonthlyIntake)
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Failed to fetch monthly drink summary"
-//         });
-//     }
-// };
 exports.getWaterMonthLogByYear = async (req, res, next) => {
     try {
         const { user_id, date } = req.query;
