@@ -29,10 +29,18 @@ const food = require('./routes/food')
 const meal = require('./routes/meal')
 const bodyParser = require('body-parser');
 const drink = require('./routes/drink')
+const sleep = require('./routes/sleep')
+const exercise = require('./routes/exercise')
+const post = require('./routes/post')
+
 app.use("/api/user",user)
 app.use("/api/food",food)
 app.use("/api/meal",meal)
 app.use("/api/drink",drink)
+app.use("/api/exercise",exercise)
+app.use("/api/post",post)
+app.use("/api/sleep",sleep)
+
 
 // Handle unregistered route for all HTTP Methods
 app.all("*", function (req, res, next) {

@@ -1,0 +1,10 @@
+const express = require('express')
+const { createSleep, getSleepLog, getSleepLogByMonth, getSleepWeekLogByMonth } = require('../controllers/sleepController')
+const router = express.Router()
+router.post('/create-sleep', createSleep)
+router.get('/get-sleep-week', getSleepLog)
+router.get('/get-sleep-month',getSleepLogByMonth)
+router.get('/get-sleep-week-month',getSleepWeekLogByMonth)
+// router.get('/get-water-year',getWaterMonthLogByYear)
+// router.patch('/remove-water-log/:id',deleteDrink)
+module.exports = router
