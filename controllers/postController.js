@@ -74,7 +74,7 @@ exports.updatePost = async (req, res, next) => {
   };
   exports.getAllPost = async (req, res, next) => {
     try {
-      const posts = await post.find({user_id:null,isDeleted:false})
+      const posts = await post.find({isDeleted:false})
       return res.status(200).json({
         success: true,
         "posts":posts
@@ -86,9 +86,10 @@ exports.updatePost = async (req, res, next) => {
 
   exports.getPostById = async (req, res, next) => {
     try {
-      const { id } = req.query;
+      const { id } = req.params;
     //   const regex  = new RegExp(name,'i');
-      const posts = await post.find({id:id,isDeleted:false,user_id:null});
+      console.log(id);
+      const posts = await post.findById(id);
       if (!posts) {
         return res.status(404).json({ message: 'Post not found' });
       }

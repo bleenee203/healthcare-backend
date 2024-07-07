@@ -9,6 +9,10 @@ const sleepSchema = new mongoose.Schema({
         type:Date,
         require: true,
     },
+    duration: {
+        type: Number,
+        require: true
+    },
     created_at:{
         type:Date,
     },
@@ -29,9 +33,9 @@ sleepSchema.set("toJSON",{
         ret.id = ret._id;
         // ret.date = moment(ret.date).tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
         // ret.updated_at = moment(ret.updated_at).tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-        const {id,start_time,end_time,created_at,updated_at,isDeleted,user_id} = ret
-        return {id,start_time,end_time,created_at,updated_at,isDeleted,user_id}
+        const {id,start_time,end_time, duration,created_at,updated_at,isDeleted,user_id} = ret
+        return {id,start_time,end_time, duration ,created_at,updated_at,isDeleted,user_id}
     }
 })
-const Sleep = mongoose.model('sleeps',drinkSchema)
+const Sleep = mongoose.model('sleeps', sleepSchema)
 module.exports = Sleep
