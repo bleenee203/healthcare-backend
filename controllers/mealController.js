@@ -1,18 +1,21 @@
 const { default: mongoose } = require("mongoose");
 const meal = require("../models/mealModel");
 const moment = require('moment');
+const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 module.exports.createMeal = async (req,res,next) =>{
     try{
-        const {meal_type,amount,kcal,food_id} = req.body.newData
+        const {meal_type,amount,date,kcal,food_id} = req.body.newData
         console.log(req.body.newData)
         const user_id = req.body.userId
         const isDeleted=false
+        const formatdate = moment.tz(date,systemTimeZone).toISOString()
+
         if(!meal_type){
             return res.status(403).send({
             success:false,
             message:"Please provide type of meal"});
         }
-        const Meal =await meal.create({user_id,meal_type,date:newDate,amount,kcal,food_id,isDeleted})
+        const Meal =await meal.create({user_id,meal_type,date:formatdate,amount,kcal,food_id,isDeleted})
         return res.status(200).json({
             success: true,
             Meal,
@@ -41,14 +44,13 @@ module.exports.createMeal = async (req,res,next) =>{
   exports.getAllFoodMealByDate = async (req, res, next) => {
     try {
       const {user_id,date} = req.query
-      const formatdate = moment(date, 'DD/MM/YYYY').add(12, 'hours').toDate();
-      console.log(formatdate);
-      // const meals = await meal.find({date:formatdate,user_id:user_id,isDeleted:false})
-          // Using aggregation to lookup food details
+      console.log("mieal dat",date);
+      const formatdate= moment.tz(date, systemTimeZone).toDate();
+      console.log("mieal dat",formatdate);
     const meals = await meal.aggregate([
       {
         $match: {
-          date: formatdate,
+          date: formatdate, 
           user_id: mongoose.Types.ObjectId.createFromHexString(user_id),
           isDeleted: false
         }
